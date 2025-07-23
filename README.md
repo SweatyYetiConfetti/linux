@@ -5,21 +5,23 @@
 ### Source Tree
 
 <ins>**arch**</ins><br />
-This subdir is for architecture specific functionality. 
+This dir is for architecture specific functionality. 
 The notes in this repo will be mainly concered with the x86 and riscv instruction sets. 
 Both AMD and Intel use the x86 instruction set making it the most widely used instruction set in personal computers.
+This dir has a Kconfig file used to specify configuration for the systems architecute dependent options.
+Inside each subdir specifying a specific architecture you will find a Makefile and a Kconfig file that will specify that architectures specific configuration and make process.
 
-<ins>block</ins>
-This subdir is
+<ins>**block**</ins><br />
+This dir is for block devices (block special file) and their associated functionality. 
+What is a block device? A block device is a file that provides an abstracted access to a hardware device (hard drive, usb,...etc) that allows reading and writing data in blocks of specified size. 
+Block devices allow themselves to be mounted by the OS and are ideal for random and sequential data access by addressing each block individually. 
+Block devices make use of system buffering for data transfers and this allows a reduction in the number of read/write operations leading to a performance improvement.
+Compatible with structured file systems and provide wear leveling to reduce overuse of certain regions of the block device improving longevity. 
+Error checking and correction algorithms can also be used to improve data integrity, transaction accuracy and stability of systems depending on block devices. 
+Block devices support booting an OS directly from them. 
 
 <ins>certs</ins>
 This subdir is
-
-<ins>COPYING</ins>
-This subdir is 
-
-<ins>CREDITS</ins>
-This subdir iskkkkkkkkk
 
 <ins>crypto</ins>
 This subdir is
