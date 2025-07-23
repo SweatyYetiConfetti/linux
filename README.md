@@ -33,11 +33,11 @@ Error checking and correction algorithms can also be used to improve data integr
 Block devices support booting an OS directly from them.<br /><br />
 
 
-<ins>certs</ins>
-This subdir is
+<ins>**certs**</ins><br />
+This dir is for providing certification functionality and is rather self explanatory.<br /><br />
 
-<ins>crypto</ins>
-This subdir is
+<ins>**crypto**</ins><br />
+This dir is
 
 <ins>Documentation</ins>
 This subdir is
