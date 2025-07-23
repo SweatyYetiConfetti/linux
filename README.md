@@ -4,7 +4,7 @@
 
 ### Source Tree
 
-<ins>arch</ins>
+<ins>arch</ins><br />
 This subdir is for architecture specific functionality. 
 The notes in this repo will be mainly concered with the x86 and riscv instruction sets. 
 Both AMD and Intel use the x86 instruction set making it the most widely used instruction set in personal computers.
