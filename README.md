@@ -50,8 +50,12 @@ This subdir is
 
 <ins>include</ins>
 This subdir is
-<ins>init</ins>
-This subdir is
+
+<ins>**init**</ins><br />
+This dir is for the initial boot process.<br /><br />
+It contains the start_kernel function which is the initial function for booting architecture independent functionality and the cornerstone of the boot process<br /><br />
+
+
 <ins>io_uring</ins>
 This subdir is
 <ins>ipc</ins>
