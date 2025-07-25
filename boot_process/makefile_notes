@@ -45,8 +45,9 @@ obj-y += init_task.o
 - If CONFIG_Y is not set to y then the optional.o object file will be ignored
 
 **CONFIG_BLK_DEV_INITRD** - configuration variable
-- Defined in init/.kunitconfig as CONFIG_BLK_DEV_INITRD=y
-- Defined in architecture specified in arch/x86/configs/*
+- Defined in init/Kconfig as BLK_DEV_INITRD
+- Assigned value in init/.kunitconfig as CONFIG_BLK_DEV_INITRD=y
+- Assigned value in architecture specified in arch/x86/configs/*
 - initramfs.c & noinitramfs.c are defined in the init dir and (no)initramfs.o is their associated object file
 
 **CONFIG_GENERIC_CALIBRATE_DELAY** - configuration variable
@@ -54,7 +55,8 @@ obj-y += init_task.o
 - calibrate.c is defined in the init dir and calibrate.o is their associated object file
 
 **CONFIG_INITRAMFS_TEST** - configuration variable
-- Defined in init/.kunitconfig as CONFIG_BLK_DEV_INITRD=y
+- Defined in init/Kconfig as INITRAMFS_TEST
+- Assigned value in init/.kunitconfig as CONFIG_BLK_DEV_INITRD=y
 - initramfs_test.c is defined in the init dir and initramfs_test.o is their associated object file
 
 mounts-y := do_mounts.o
