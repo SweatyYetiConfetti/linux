@@ -1,3 +1,6 @@
+____________________________________________________________
+____________________________________________________________
+
 ccflags-y := -fno-function-sections -fno-data-sections
 
 **ccflags-y** specifies the compilation flags 
@@ -10,6 +13,9 @@ ccflags-y := -fno-function-sections -fno-data-sections
 **fno-data-sections** is a compilation flag
 - Places all data variables into a single combined ELF section within the object file
 - Overrides the default **fdata-selections** which specifies an individual ELF section for each data variable in the source
+
+____________________________________________________________
+____________________________________________________________
 
 obj-y := main.o version.o mounts.o
 ifneq ($(CONFIG_BLK_DEV_INITRD),y)
@@ -59,9 +65,98 @@ obj-y += init_task.o
 - Assigned value in init/.kunitconfig as CONFIG_BLK_DEV_INITRD=y
 - initramfs_test.c is defined in the init dir and initramfs_test.o is their associated object file
 
+____________________________________________________________
+____________________________________________________________
+
 mounts-y := do_mounts.o
 mounts-$(CONFIG_BLK_DEV_RAM) += do_mounts_rd.o
 mounts-$(CONFIG_BLK_DEV_INITRD) += do_mounts_initrd.o
 
-**mounts-y** - specifies mounts
+**mounts-y** - specifies mounting config
+- This will call the mount process for making a file system on a various memory devices
+- mount /dev/example /path/to/location
+- do_mounts.o is for general filesystems
+- do_mounts_rd.o & do_mounts_initrd.o are for the rd filesystem
+- initrd filesystem used exclusively during the boot process
+- initrd stands for initial ram disk 
+- This is a temporary root filesystem mounted by the boot loader which contains essential drivers and modules for further booting
+
+
+**CONFIG_BLK_DEV_RAM** - configuration variable
+- Defined in architecture specific file - arch/x86/kernel/setup.c
+- Mentioned in BLK_DEV_INITRD Kconfig definition => Both together means support for initrd & the 15 Kbytes needed
+
+____________________________________________________________
+____________________________________________________________
+
+smp-flag-$(CONFIG_SMP) := SMP
+preepmt-flag-$(CONFIG_PREEMPT_BUILD) := PREEMPT
+preepmt-flag-$(CONFIG_PREEMPT_DYNAMIC) := PREEMPT_DYNAMIC
+preepmt-flag-$(CONFIG_PREEMPT_RT) := PREEMPT_RT
+
+**smp-flag-y** - specifies symmetric multiprocessing config for CPU
+
+**preempt-flag-y** - specifies preemption config for CPU
+
+**CONFIG_SMP** - configuration variable
+- Architecture specific variable
+- Assigned value in arch/x86/configs/.*_defconfig 
+
+**CONFIG_PREEMPT_DYNAMIC** - configuration variable
+- allows choice of preemption strategy to be deferred until boot time where any mode but PREEMPT_RT can be selected
+- architecture specific in arch/x86/configs/
+
+**CONFIG_PREEMPT_RT** - configuration variable
+- RT stands for Real-Time
+- Two modes
+-- Preemptible Kernel (Basic RT) 
+--- Mainly used for testing and debugging of substitution mechanisms 
+-- Fully Preemptible Kernel (RT)
+--- All kernel code is preemptible except for a few select critical sections
+
+
+
+____________________________________________________________
+____________________________________________________________
+
+build-version = $(or $(KBUILD_BUILD_VERSION), $(build-version-auto))
+build-timestamp = $(or $(KBUILD_BUILD_TIMESTAMP), $(build-timestamp-auto))
+
+____________________________________________________________
+____________________________________________________________
+
+filechk_uts_version = \
+	utsver=$$(echo '$(pound)'"$(build-version)" $(smp-flag-y) $(preempt-flag-y) "$(build-timestamp)" | cut -b -64); \
+	echo '$(pound)'define UTS_VERSION \""$${utsver}"\"
+
+____________________________________________________________
+____________________________________________________________
+
+$(obj)/utsversion-tmp.h: FORCE
+	$(call filechk,uts_version)
+
+clean-files += utsversion-tmp.h
+
+____________________________________________________________
+____________________________________________________________
+
+$(obj)/version.o: $(obj)/utsversion-tmp.h
+CFLAGS_version.o := -include $(obj)/utsversion-tmp.h
+
+____________________________________________________________
+____________________________________________________________
+
+include/generated/utsversion.h: build-version-auto = $(shell $(srctree)/scripts/build-version)
+include/generated/utsversion.h: build-timestamp-auto = $(shell LC_ALL=C date)
+include/generated/utsversion.h: FORCE
+	$(call filechk,uts_version)
+
+____________________________________________________________
+____________________________________________________________
+
+$(obj)/version-timestamp.o: include/generated/utsversion.h
+CFLAGS_version-timestamp.o := -include include/generated/utsversion.h
+
+____________________________________________________________
+____________________________________________________________
 
