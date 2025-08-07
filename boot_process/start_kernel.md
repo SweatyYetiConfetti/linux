@@ -40,6 +40,50 @@ Now into init/main.c we can find the start_kernel function source code
 -- char *after_dashes;
 --- two string literals that will be used to construct a command line instruction
 
-- set_task_stack_end_magic(&init_task)
+> set_task_stack_end_magic(&init_task);
+- #include <linux/sched/task_stack.h> => kernel/fork.c
+- inits a task stack with magic number sentinel
+- provides end of stack notice 
+- provides stack overflow detection
+
+> smp_setup_processor_id();
+- #include <linux/smp.h>
+- hook provided in init/main.c
+- makes use of __init and __weak macros
+- this provides a basic implementation when an architecture specific implementation is not specified (utilized by linker)
+- set up symmetric multi-processing
+- not utilized in the x86 architecture
+ 
+> debug_objects_early_init();
+- #include <linux/debugobjects.h> => lib/debugobjects.c
+- static inline hook specified in include/linux/debugobjects.h
+- initializing the hash bucks and link the static object pool objects into the poll list
+- essentially creating the underlying datastructures for the object tracker
+- the kernel level debug objects object tracker are used to track the lifetime of kernel objects and validate operations on them
+
+> init_vmlinux_build_id();
+- #include <linux/buildid.h> => lib/buildid.c
+- static inline hook specified in include/linux/buildid.h 
+- compute and stash the running kernels build ID
+- typically stored in the ELF file under section .note.gnu.build-id
+
+> cgroup_init_early();
+- #include <linux/cgroup.h> => kernel/cgroup/cgroup.c
+- static inline hook specified in include/linux/cgroup.h
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
