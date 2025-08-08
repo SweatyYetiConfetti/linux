@@ -70,6 +70,17 @@ Now into init/main.c we can find the start_kernel function source code
 > cgroup_init_early();
 - #include <linux/cgroup.h> => kernel/cgroup/cgroup.c
 - static inline hook specified in include/linux/cgroup.h
+- initializes cgroups and any early subsystems that request early init
+- the css are the cgroup subsystems
+
+> local_irq_disable();
+- #include <linux/sched.h> => #include <linux/irqflags.h>
+- defined as macros in the include/linux/irqflags.h where it calls raw_local_irq_disable();
+- raw_local_irq_disable defined as a macro in include/linux/irqflags.h which refers to arch_local_irq_disable();
+- arch_local_irq_disable defined as static and always inline function in arch/x86/include/asm/irqflags and calls native_irq_disable() in same file
+- native_irq_disable calls asm volatile embedding asm instruction "cli" to turn off interrupts and not to be altered by the compiler 
+- disables cpu interrupts for part of the boot process
+- disabling interrupts in for kernel space only
 
 
 
