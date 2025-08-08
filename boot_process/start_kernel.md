@@ -97,20 +97,41 @@ Now into init/main.c we can find the start_kernel function source code
 - if CONFIG_SMP => __boot_cpu_id = symmetric multiprocessor id
 
 > page_address_init();
+- imported into start_kernel via #include <linux/memblock.h> 
+- function signature and macro defined in include/linux/mm.h
+- source found in mm/highmem.c
+- highmem.c defines a static page_address_slot struct array as page_address_htable
+- iterates over the page_address_htable array and initializes the page_address_htables list head and spinlock
+
+> setup_arch(&command_line);
+- imported into start kernel via #include <linux/init.h>
+- function signature defined in include/linux/init.h
+- cpu arch specific source can be found in arch/x86/kernel/setup.c
+- functionality depends on whether (U)EFI loader was successful
+- make use of (U)EFI data structs and interfaces if successful
+- efi init code enabled via global efi_enabled
+- if 32 bit
+-- memcpy new_cpu_data into boot_cpu_data
+-- clone initial page table into swapper page dir
+-- load swapper page dir into cr3 
+-- cr3 is the x86 register that holds the current processes page directory base register (PDBR) aka root page table
+-- flush translation lookaside buffer (tlb)
+- if 64 bit
+-- set boot_cpu_data.x86_phys_bits
+- append boot loader command line to builtin command line
+- copy boot_command_line into command_line
+- point cmdline_p at command_line
+- check for olpc ofw (one laptop per child - open firmware) - bootloader
+- initialize the Interrupt Descriptor Table (IDT) with early traps
+
+- jump_label_init() => requires more researching
+- initialize static call support that will allow code patching to hard-code function pointers into direct branch instructions
+- setup temporary memory mappings to facilitate further booting until full ioremap is established
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+- #include <linux/jump_label.h> => kernel/jump_label.c
+- 
 
