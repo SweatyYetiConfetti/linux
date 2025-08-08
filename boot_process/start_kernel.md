@@ -81,6 +81,22 @@ Now into init/main.c we can find the start_kernel function source code
 - native_irq_disable calls asm volatile embedding asm instruction "cli" to turn off interrupts and not to be altered by the compiler 
 - disables cpu interrupts for part of the boot process
 - disabling interrupts in for kernel space only
+- following this function call, early_boot_irqs_disabled is set to true for future accounting
+
+> boot_cpu_init();
+- function signature defined in include/linux/cpu.h
+- no hook defined in include/linux/cpu.h
+- defined in kernel/cpu.c
+- overview: activate the first processor
+- obtain symmetric multiprocessor id
+- set cpu online, active, present and possible
+- set_cpu_online, set_cpu_active, set_cpu_present, set_cpu_possible(cpu, bool)
+- set_cpu_online is found in kernel/cpu.c
+- set_cpu_active, set_cpu_present, set_cpu_possible defined as macro in include/linux/cpumask.h
+- all three of these macros make use of the assign_cpu macro defined in the same file
+- if CONFIG_SMP => __boot_cpu_id = symmetric multiprocessor id
+
+> page_address_init();
 
 
 
