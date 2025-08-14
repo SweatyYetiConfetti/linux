@@ -123,8 +123,13 @@ Now into init/main.c we can find the start_kernel function source code
 - point cmdline_p at command_line
 - check for olpc ofw (one laptop per child - open firmware) - bootloader
 - initialize the Interrupt Descriptor Table (IDT) with early traps
-
-- jump_label_init() => requires more researching
+- initialize static const struct cpu_dev cpu_devs[index] with the cpudev
+- loop over cpu_devs and point them at c_ident[index]
+- make use of struct cpuinfo_x86 boot_cpu_data in early_identify_cpu to perform minimum cpu detection early
+- fields needed in cpuinfo_x86 are vendor, cpuid_level, family, model, mask, cache_alignment
+- only called during boot of CPU
+- jump_label_init() for jump label, which is a mechanism for optimizing conditional branch conditions
+- particularly useful for kernel tracing, hence its early initialization in the boot process especially in debugging and tracing
 - initialize static call support that will allow code patching to hard-code function pointers into direct branch instructions
 - setup temporary memory mappings to facilitate further booting until full ioremap is established
 
