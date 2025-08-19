@@ -132,7 +132,18 @@ Now into init/main.c we can find the start_kernel function source code
 - particularly useful for kernel tracing, hence its early initialization in the boot process especially in debugging and tracing
 - initialize static call support that will allow code patching to hard-code function pointers into direct branch instructions
 - setup temporary memory mappings to facilitate further booting until full ioremap is established
-
+- map the one laptop per child open firmware page global directory memory region into the kernels address space - allowing for kernel interaction with OPLC OFW
+- translate the fields of struct boot_param into global variables
+- reserve some memory before memory is added to memblock so memblock allocations wont overwrite it when invoking e820
+- everything still needed from the boot loader or firmware or kernel _text in elf file should be early reserved or marked not RAM
+- all other memory is free and fair game in accordance with e820 table (reports memory usage to kernel)
+- call e820__memory_setup to pick up the firmware/bootloader E820 map
+- get boot_params struct, loop over the data and assign data to the memory in accordance with the type defined in a while loop with a switch statement
+- copy BIOS Enhanced Disk Drive data from the boot_params into a safe place
+- assign start_code, end_code, end_data and brk for the struct mm_struct init_mm
+- configure the non-executable bit used to mark memory pages as non-executable - a security feature used to prevent all arbitrary pages from being executable
+- called before parse_early_param to determine if HW supports the NX bit
+- copy boot_command_line into tmp_cmdline and parse the early options
 
 
 
