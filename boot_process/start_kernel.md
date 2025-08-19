@@ -144,8 +144,20 @@ Now into init/main.c we can find the start_kernel function source code
 - configure the non-executable bit used to mark memory pages as non-executable - a security feature used to prevent all arbitrary pages from being executable
 - called before parse_early_param to determine if HW supports the NX bit
 - copy boot_command_line into tmp_cmdline and parse the early options
-
-
+- check if (U)EFI boot is enabled
+-- if (U)EFI is enabled
+--- reserve memory ranges for use of (U)EFI 
+- report the state of NX bit
+- setup Advanced Programmable Interrupt Controller (APIC)
+- after parse_early_params call e820__finish_early_params since we already have an e820 table filled in via the parameter callback functions, but needs to be sorted and printed via this function call
+- if (U)EFI enable then efi_init()
+-- setup UEFI runtime services and environment
+- find, reserve memory region and conserve the iSCSI Boot Format Table
+- initialize the desktop management interface via x86_init.resources.dmi_setup
+- detect VMware (requires DMI) 
+- initialize hypervisor platform by copying detected hypervisor vendor init and runtime, setting x86_hyper_type and init_platform()
+- initialize the Time Stamp Counter (TSC) frequency and begin counting 
+- probe BIOS read only memory
 
 
 - #include <linux/jump_label.h> => kernel/jump_label.c
