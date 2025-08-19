@@ -158,6 +158,18 @@ Now into init/main.c we can find the start_kernel function source code
 - initialize hypervisor platform by copying detected hypervisor vendor init and runtime, setting x86_hyper_type and init_platform()
 - initialize the Time Stamp Counter (TSC) frequency and begin counting 
 - probe BIOS read only memory
+- use __pa_symbol macro to reach the physical address of code_resource, rodata_resource, data_resource and bss_resource
+- insert the above physical addresses into iomem_resource and must be done before trim_bios_range
+- call trim_bios_range and work out special case of 4Kb of memory that is BIOS owned, not by the kernel, general ignored detail in the e820 table
+- if 32 bit system
+-- if ppro_with_ram_bug()
+--- then more explicit memory management to mitigate the bug
+- if 64 bit system
+-- run early_gart_iommu_check
+--- Graphics Address Remapping Table (GART)
+--- check for overlapping GART regions from a kernel that doesn't shutdown the GART properly via kexec/kdump
+--- update the e820 map to mark new region to reserve
+- 
 
 
 - #include <linux/jump_label.h> => kernel/jump_label.c
