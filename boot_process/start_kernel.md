@@ -169,7 +169,23 @@ Now into init/main.c we can find the start_kernel function source code
 --- Graphics Address Remapping Table (GART)
 --- check for overlapping GART regions from a kernel that doesn't shutdown the GART properly via kexec/kdump
 --- update the e820 map to mark new region to reserve
-- 
+- get the highest page frame number available for the maximum architecture page frame number available on the system (partially used pages are not usable) 
+- initialize the Memory Type Range Registers (MTRR) and Page Attribute Table (PAT) which are HW mechanisms used for caching in different memory regions 
+- PAT is newer version of MTRR
+- confirm that cache config is uniform across the system
+- if mtrr_trim_uncached_memory(max_pfn) 
+-- reobtain the max_pfn via e820__end_of_ram_pfn()
+- perform Kernel Address Space Layout Randomization (KASLR) 
+-- KASLR is a security feature that randomizes the memory address of kernel code and data at each boot to obfuscate memory addresses so reboots cannot be used during unauthorized memory access - remove predictable addressing
+- if 32 bit system
+-- find the lowest page frame number range
+-if 64 bit system
+-- check_x2apic - see if system is compatible with x2apic which is a more advanced version of apic for systems with a large number of cpus/threads
+- reassign page frame number to max_low_pfn based on current max_pfn
+- find multi processing configuration table (mptable) and reserve the memory region 
+- allocate memory space for page table structs via early_alloc_pgt_buf
+-
+
 
 
 - #include <linux/jump_label.h> => kernel/jump_label.c
