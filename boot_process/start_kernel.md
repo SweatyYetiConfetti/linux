@@ -8,7 +8,7 @@ The header file for start_kernel is found in the include/linux/start_kernel.h an
 
 start_kernel.h includes
 
-> extern asmlinkage void __init __noreturn start_kernel(void);
+``` extern asmlinkage void __init __noreturn start_kernel(void);``` 
 
 Breaking down this function signature word by word gives
 - extern => function assumed to be found elsewhere with resolution deferred to the linker
@@ -23,30 +23,30 @@ Breaking down this function signature word by word gives
 
 - start_kernel(void) => function name and parameters
 
-> #include <linux/linkage.h>
+``` #include <linux/linkage.h>``` 
 - primarily used for managing function calling conventions in the context of assembly language and arch specific code
 - it does this by defining 59 macros
 
-> #include <linux/init.h>
+``` #include <linux/init.h>``` 
 - primarily used for defining macros and attributes related to booting and exiting processes of the kernel and its modules 
 - important macros are the __init, __initdata and __exit macros 
 - also defines the module_init and module_exit macros
 
 Now into init/main.c we can find the start_kernel function source code
-> void start_kernel(void) 
+``` void start_kernel(void);``` 
 
 - First defines two variables used later in the function
 -- char *command_line;
 -- char *after_dashes;
 --- two string literals that will be used to construct a command line instruction
 
-> set_task_stack_end_magic(&init_task);
+``` set_task_stack_end_magic(&init_task);``` 
 - #include <linux/sched/task_stack.h> => kernel/fork.c
 - inits a task stack with magic number sentinel
 - provides end of stack notice 
 - provides stack overflow detection
 
-> smp_setup_processor_id();
+``` smp_setup_processor_id();``` 
 - #include <linux/smp.h>
 - hook provided in init/main.c
 - makes use of __init and __weak macros
@@ -54,26 +54,26 @@ Now into init/main.c we can find the start_kernel function source code
 - set up symmetric multi-processing
 - not utilized in the x86 architecture
  
-> debug_objects_early_init();
+``` debug_objects_early_init();``` 
 - #include <linux/debugobjects.h> => lib/debugobjects.c
 - static inline hook specified in include/linux/debugobjects.h
 - initializing the hash bucks and link the static object pool objects into the poll list
 - essentially creating the underlying datastructures for the object tracker
 - the kernel level debug objects object tracker are used to track the lifetime of kernel objects and validate operations on them
 
-> init_vmlinux_build_id();
+``` init_vmlinux_build_id();``` 
 - #include <linux/buildid.h> => lib/buildid.c
 - static inline hook specified in include/linux/buildid.h 
 - compute and stash the running kernels build ID
 - typically stored in the ELF file under section .note.gnu.build-id
 
-> cgroup_init_early();
+``` cgroup_init_early();``` 
 - #include <linux/cgroup.h> => kernel/cgroup/cgroup.c
 - static inline hook specified in include/linux/cgroup.h
 - initializes cgroups and any early subsystems that request early init
 - the css are the cgroup subsystems
 
-> local_irq_disable();
+``` local_irq_disable();``` 
 - #include <linux/sched.h> => #include <linux/irqflags.h>
 - defined as macros in the include/linux/irqflags.h where it calls raw_local_irq_disable();
 - raw_local_irq_disable defined as a macro in include/linux/irqflags.h which refers to arch_local_irq_disable();
@@ -83,7 +83,7 @@ Now into init/main.c we can find the start_kernel function source code
 - disabling interrupts in for kernel space only
 - following this function call, early_boot_irqs_disabled is set to true for future accounting
 
-> boot_cpu_init();
+``` boot_cpu_init();``` 
 - function signature defined in include/linux/cpu.h
 - no hook defined in include/linux/cpu.h
 - defined in kernel/cpu.c
@@ -96,14 +96,14 @@ Now into init/main.c we can find the start_kernel function source code
 - all three of these macros make use of the assign_cpu macro defined in the same file
 - if CONFIG_SMP => __boot_cpu_id = symmetric multiprocessor id
 
-> page_address_init();
+``` page_address_init();``` 
 - imported into start_kernel via #include <linux/memblock.h> 
 - function signature and macro defined in include/linux/mm.h
 - source found in mm/highmem.c
 - highmem.c defines a static page_address_slot struct array as page_address_htable
 - iterates over the page_address_htable array and initializes the page_address_htables list head and spinlock
 
-> setup_arch(&command_line);
+``` setup_arch(&command_line);``` 
 - imported into start kernel via #include <linux/init.h>
 - function signature defined in include/linux/init.h
 - cpu arch specific source can be found in arch/x86/kernel/setup.c
@@ -184,7 +184,19 @@ Now into init/main.c we can find the start_kernel function source code
 - reassign page frame number to max_low_pfn based on current max_pfn
 - find multi processing configuration table (mptable) and reserve the memory region 
 - allocate memory space for page table structs via early_alloc_pgt_buf
--
+- must conclude brk before memblock setup, since there could be overlap 
+- brk segment marks the end of the data section, specifically unitialized data segment (BSS) 
+- cleanup the high memory address space before setting up memblock
+- if CONFIG_MEMORY_HOTPLUG
+-- Memory used by kernel cannot be hot-removed - no action or memblock_set_bottom_up = true
+- since only first megabyte is mapped for certain, use it set a current limit up to ISA_END_ADDRESS
+- allow for memblock to be resized for e820 table entries and loop over e820 table entries and reserve and add memblock for the table entry
+- then trim the partial pages and get report on e820 table entry mapped memory region
+- run memory encryption architecture setup after report on memory regions, must happen after memblock setup because it needs the physical memory size
+- initialize RNG for confidential computing (CoCo/CC) 
+- loop over the efi memory descriptions and mark the mirror, sum the size and output mirror size and total size
+
+
 
 
 
