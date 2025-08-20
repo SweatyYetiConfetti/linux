@@ -1,3 +1,6 @@
+____________________________________________________________
+____________________________________________________________
+
 start_kernel is the first architecture agnostic call into the linux source code during the boot process. 
 
 For this reason, it is the vital function call for initializing and configuring a linux system. 
@@ -23,6 +26,9 @@ Breaking down this function signature word by word gives
 
 - start_kernel(void) => function name and parameters
 
+____________________________________________________________
+____________________________________________________________
+
 ``` #include <linux/linkage.h>``` 
 - primarily used for managing function calling conventions in the context of assembly language and arch specific code
 - it does this by defining 59 macros
@@ -40,11 +46,17 @@ Now into init/main.c we can find the start_kernel function source code
 -- char *after_dashes;
 --- two string literals that will be used to construct a command line instruction
 
+____________________________________________________________
+____________________________________________________________
+
 ``` set_task_stack_end_magic(&init_task);``` 
 - #include <linux/sched/task_stack.h> => kernel/fork.c
 - inits a task stack with magic number sentinel
 - provides end of stack notice 
 - provides stack overflow detection
+
+____________________________________________________________
+____________________________________________________________
 
 ``` smp_setup_processor_id();``` 
 - #include <linux/smp.h>
@@ -54,6 +66,9 @@ Now into init/main.c we can find the start_kernel function source code
 - set up symmetric multi-processing
 - not utilized in the x86 architecture
  
+____________________________________________________________
+____________________________________________________________
+
 ``` debug_objects_early_init();``` 
 - #include <linux/debugobjects.h> => lib/debugobjects.c
 - static inline hook specified in include/linux/debugobjects.h
@@ -61,17 +76,26 @@ Now into init/main.c we can find the start_kernel function source code
 - essentially creating the underlying datastructures for the object tracker
 - the kernel level debug objects object tracker are used to track the lifetime of kernel objects and validate operations on them
 
+____________________________________________________________
+____________________________________________________________
+
 ``` init_vmlinux_build_id();``` 
 - #include <linux/buildid.h> => lib/buildid.c
 - static inline hook specified in include/linux/buildid.h 
 - compute and stash the running kernels build ID
 - typically stored in the ELF file under section .note.gnu.build-id
 
+____________________________________________________________
+____________________________________________________________
+
 ``` cgroup_init_early();``` 
 - #include <linux/cgroup.h> => kernel/cgroup/cgroup.c
 - static inline hook specified in include/linux/cgroup.h
 - initializes cgroups and any early subsystems that request early init
 - the css are the cgroup subsystems
+
+____________________________________________________________
+____________________________________________________________
 
 ``` local_irq_disable();``` 
 - #include <linux/sched.h> => #include <linux/irqflags.h>
@@ -82,6 +106,9 @@ Now into init/main.c we can find the start_kernel function source code
 - disables cpu interrupts for part of the boot process
 - disabling interrupts in for kernel space only
 - following this function call, early_boot_irqs_disabled is set to true for future accounting
+
+____________________________________________________________
+____________________________________________________________
 
 ``` boot_cpu_init();``` 
 - function signature defined in include/linux/cpu.h
@@ -96,12 +123,18 @@ Now into init/main.c we can find the start_kernel function source code
 - all three of these macros make use of the assign_cpu macro defined in the same file
 - if CONFIG_SMP => __boot_cpu_id = symmetric multiprocessor id
 
+____________________________________________________________
+____________________________________________________________
+
 ``` page_address_init();``` 
 - imported into start_kernel via #include <linux/memblock.h> 
 - function signature and macro defined in include/linux/mm.h
 - source found in mm/highmem.c
 - highmem.c defines a static page_address_slot struct array as page_address_htable
 - iterates over the page_address_htable array and initializes the page_address_htables list head and spinlock
+
+____________________________________________________________
+____________________________________________________________
 
 ``` setup_arch(&command_line);``` 
 - imported into start kernel via #include <linux/init.h>
@@ -199,6 +232,9 @@ Now into init/main.c we can find the start_kernel function source code
 
 
 
+
+____________________________________________________________
+____________________________________________________________
 
 - #include <linux/jump_label.h> => kernel/jump_label.c
 - 
