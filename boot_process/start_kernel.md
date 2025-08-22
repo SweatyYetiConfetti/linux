@@ -253,7 +253,14 @@ ____________________________________________________________
 - parse the SMP config data before the initmem_init 
 - retrieve system hardware configs stored in the flattened device tree
 - initialize memory structures: NUMA, APCI Static Resource Affinity Table (SRAT) and registering memblock to establish node specific structures (NODE_DATA)
-
+- reserve areas for contiguous memory handling, reserving memory from early allocator, calling arch specific code once the early allocator has been activated and all other subsystems have already allocated/reserved memory
+- if large pages (GB) features is set then reserve memory for huge table lookaside buffer and allocate the memory
+- reserve memory for a kernel crash dump allowing a separate kernel to inspect prev crashed kernel data
+- platform specific paging initialization call to setup the kernel pagetables and prepare accessors functions, callback must call paging_init(), called once after the direct mapping for physical memory is available
+- init Kernal Address Sanitizer, a dynamic memory safety error detector in the kernel by setting up the shadow memory which tracks the allocated memory addresses and other data structures used to validate memory accesses and error reporting
+- sync the back kernel address range by creating, setting up and updating the inital page tables used by the kernel during boot
+- probe and signal the use of trusted boot framework
+- setup the virtual system calls page, a memory mapped into every processes address space
 
 
 
