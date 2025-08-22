@@ -228,6 +228,32 @@ ____________________________________________________________
 - run memory encryption architecture setup after report on memory regions, must happen after memblock setup because it needs the physical memory size
 - initialize RNG for confidential computing (CoCo/CC) 
 - loop over the efi memory descriptions and mark the mirror, sum the size and output mirror size and total size
+- remap the efi memory descriptions table, validate it, mark it reserved and unmap it
+- ESRT is EFI System Resource Table (efi_esrt_init) and is a data structure that supports firmware updates and ops
+- init EFI Machine Owner Keys by init on the MOK var table
+- EFI MOKvar table must be initialized before boot services in order to guarantee that it can mark the table as reserved
+- now the system can reserve memory regions for the boot services
+- allocate 4k memblock for the e820 multi-process configuration
+- if configured to check bios corruption, do so
+- if 32 bit config then print initial memory mapped address
+- find free memory for the real mode trampoline, on (U)EFI there is not enough free memory under 1M and make another attempt to reclaim the memory at efi_free_boot_services
+- regardless, reserve entire first 1< of RAM because BIOS is known for corrupting low memory
+- after init_mem_mapping is done with the early IDT page fault handling, you enable Flex Return and Event Delivery or install the real page fault handler
+- update mmu cr4 features - mmu cr4 is a x86 register that enables memory management and virtualization extensions
+- set the physical address of the current allocation limit
+- if CONFIG_PROVIDE_OHCI1394_DMA_INIT then start the dma controllers
+- test whether the EFI bits are enabled or false if the CONFIG_EFI macro is not set
+- ensure that the init ram disk image containing drivers and tools for mounting real filesystem are properly loaded into memory
+- consider CONFIG_ACPI_TABLE_OVERRIDE_VIA_BUILTIN_INITRD to customize the acpi table from the initrd
+- checksum all the acpi tables, enumerate lapics (local acpi) and io-apics
+- detect and initialize the handling of virtual symmetric multi-processing via vsmp_init
+- if no io_delay_override specified then run desktop management interface check on system on dmi table
+- check early platform quirks to detect apple computer systems 
+- complete the initialization of acpi table and process the multiple apic description table (MADT) and HW ACPI mode initialization
+- parse the SMP config data before the initmem_init 
+- retrieve system hardware configs stored in the flattened device tree
+- initialize memory structures: NUMA, APCI Static Resource Affinity Table (SRAT) and registering memblock to establish node specific structures (NODE_DATA)
+
 
 
 
